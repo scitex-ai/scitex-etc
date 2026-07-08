@@ -34,3 +34,4 @@ docs/sphinx/_build/
 
 # coverage.py parallel-mode worker files (consolidated into .coverage by combine)
 .coverage.*
+.worktrees/
