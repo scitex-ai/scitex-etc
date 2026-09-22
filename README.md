@@ -16,7 +16,7 @@
 <p align="center">
   <a href="https://pypi.org/project/scitex-etc/"><img src="https://img.shields.io/pypi/v/scitex-etc?label=pypi" alt="pypi"></a>
   <a href="https://pypi.org/project/scitex-etc/"><img src="https://img.shields.io/pypi/pyversions/scitex-etc?label=python" alt="python"></a>
-  <a href="https://github.com/ywatanabe1989/scitex-etc/actions/workflows/rtd-sphinx-build-on-ubuntu-latest.yml"><img src="https://img.shields.io/github/actions/workflow/status/ywatanabe1989/scitex-etc/rtd-sphinx-build-on-ubuntu-latest.yml?branch=develop&label=docs" alt="docs"></a>
+  <a href="https://scitex-etc.readthedocs.io/en/latest/"><img src="https://img.shields.io/readthedocs/scitex-etc?label=docs" alt="docs"></a>
 </p>
 <p align="center">
   <a href="https://github.com/ywatanabe1989/scitex-etc/actions/workflows/pytest-matrix-on-ubuntu-py3-11-3-12-3-13.yml"><img src="https://img.shields.io/github/actions/workflow/status/ywatanabe1989/scitex-etc/pytest-matrix-on-ubuntu-py3-11-3-12-3-13.yml?branch=develop&label=tests" alt="tests"></a>
@@ -31,23 +31,79 @@
 
 | # | Problem | Solution |
 |---|---------|----------|
-| 1 | **Scripts that pause for a keypress need raw-stdin + termios gymnastics** — 15 lines of OS-dependent boilerplate | **`wait_key()` / `count()`** — one import; handles Linux/macOS/Windows; falls back cleanly when stdin isn't a TTY |
+| 1 | **Keypress pause** — raw stdin needs OS boilerplate. | **One import** — wait_key handles Linux macOS Windows. |
+
+## Quick Start
+
+```python
+import multiprocessing
+from scitex_etc import wait_key, count
+
+# count() prints an incrementing counter forever (1 per second).
+# Run it in a subprocess and use wait_key() to stop on 'q'.
+p = multiprocessing.Process(target=count)
+p.start()
+wait_key(p)
+```
+
+## Demo
+
+```mermaid
+%%{init: {'flowchart': {'nodeSpacing': 20, 'rankSpacing': 40, 'curve': 'linear'}, 'themeVariables': {'fontSize': '12px'}}}%%
+flowchart LR
+    User[User keypress] --> TTY{stdin is TTY?}
+    TTY -- yes --> Termios[termios raw mode]
+    TTY -- no --> Fallback[readline fallback]
+    Termios --> Key[key string]
+    Fallback --> Key
+```
+
+<p align="center"><sub><b>Figure 1.</b> Keypress handling from stdin check to key string.</sub></p>
 
 ## Installation
 
 ```bash
-pip install scitex-etc
+uv pip install "scitex-etc[all]"
 ```
+
+<details>
+<summary><b>Per-module extras</b></summary>
+
+<br>
+
+| Extra | Pulls in |
+|---|---|
+| `dev` | pytest, pytest-cov, ruff, scitex-dev |
+| `docs` | Sphinx plus theme and myst-parser |
+| `all` | dev plus docs (recommended) |
+
+```bash
+uv pip install "scitex-etc[dev]"  # contributors
+uv pip install -e ".[dev]"         # editable install
+```
+
+</details>
 
 ## Architecture
 
+### 1. Input handling
+
+`wait_key` abstracts raw-stdin keypress handling across Linux, macOS, and Windows with TTY fallback.
+
+### 2. Media rendering
+
+`media.render` classifies, detects, and shows media files for terminal, chat, and markdown targets.
+
+```mermaid
+%%{init: {'flowchart': {'nodeSpacing': 20, 'rankSpacing': 40, 'curve': 'linear'}, 'themeVariables': {'fontSize': '12px'}}}%%
+flowchart LR
+    INPUT[wait_key and count] --> CORE[core helpers]
+    MEDIA[media render] --> CLASSIFY[classify and detect]
+    CORE --> OUT[interactive utilities]
+    CLASSIFY --> OUT
 ```
-scitex-etc/
-├── src/scitex_etc/
-│   ├── _wait_key.py     # cross-platform raw-stdin keypress
-│   └── _count.py        # countdown helper
-└── tests/
-```
+
+<p align="center"><sub><b>Figure 2.</b> Module collaboration from input and media to utilities.</sub></p>
 
 ## 1 Interfaces
 
@@ -91,30 +147,6 @@ Also available as a CLI (`python -m scitex_etc.media.render show|classify|detect
 and as MCP tools (`scitex_etc.media.render.mcp_server`).
 
 </details>
-
-## Demo
-
-```mermaid
-flowchart LR
-    User[User keypress] --> TTY{stdin is TTY?}
-    TTY -- yes --> Termios[termios raw mode]
-    TTY -- no --> Fallback[readline fallback]
-    Termios --> Key[key string]
-    Fallback --> Key
-```
-
-## Quick Start
-
-```python
-import multiprocessing
-from scitex_etc import wait_key, count
-
-# count() prints an incrementing counter forever (1 per second).
-# Run it in a subprocess and use wait_key() to stop on 'q'.
-p = multiprocessing.Process(target=count)
-p.start()
-wait_key(p)
-```
 
 ## Part of SciTeX
 

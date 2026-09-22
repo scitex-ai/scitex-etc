@@ -53,10 +53,13 @@ def count(*, printer=print, sleeper=time.sleep):
 
 
 if __name__ == "__main__":
+    import scitex_logging as slogging
+
+    log = slogging.getLogger(__name__)
     p1 = multiprocessing.Process(target=count)
 
     p1.start()
     wait_key(p1)
-    print("aaa")
+    log.info("aaa")
 
 # EOF

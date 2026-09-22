@@ -9,6 +9,7 @@ Usage:
 
 import argparse
 import json
+import sys
 
 
 def main(argv=None):
@@ -46,19 +47,19 @@ def main(argv=None):
 
         result = show(args.path, target=args.target, root_path=args.root, alt=args.alt)
         if args.target != "terminal":
-            print(result)
+            sys.stdout.write(str(result) + "\n")
 
     elif args.command == "classify":
         from . import classify
 
         ref = classify(args.path)
-        print(json.dumps(ref, indent=2) if ref else "null")
+        sys.stdout.write((json.dumps(ref, indent=2) if ref else "null") + "\n")
 
     elif args.command == "detect":
         from . import detect
 
         refs = detect(args.text, root_path=args.root)
-        print(json.dumps(refs, indent=2))
+        sys.stdout.write(json.dumps(refs, indent=2) + "\n")
 
     else:
         parser.print_help()

@@ -16,8 +16,8 @@ _HAS_FASTMCP = mcp_server.FASTMCP_AVAILABLE
 
 def _tool_fn(name):
     """Return the underlying Python function for a registered MCP tool."""
-    tools = asyncio.run(mcp_server.mcp.get_tools())
-    return tools[name].fn
+    tool = asyncio.run(mcp_server.mcp.get_tool(name))
+    return tool.fn
 
 
 class TestModuleContract:

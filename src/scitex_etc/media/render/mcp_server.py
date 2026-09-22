@@ -81,7 +81,10 @@ def main():
     if not FASTMCP_AVAILABLE:
         import sys
 
-        print("MCP server requires fastmcp: pip install fastmcp")
+        import scitex_logging as slogging
+
+        log = slogging.getLogger(__name__)
+        log.error("MCP server requires fastmcp: pip install fastmcp")
         sys.exit(1)
     mcp.run(transport="stdio")
 

@@ -25,6 +25,7 @@ classifiers = [
 dependencies = [
     "tomli; python_version<\"3.11\"",
     "readchar",
+    "scitex-logging>=0.1.0",
 ]
 
 [project.optional-dependencies]
@@ -62,6 +63,10 @@ packages = ["src/scitex_etc"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "smoke: fast CLI happy-path tests (<60s, runs on every PR)",
+    "e2e: end-to-end workflows against real subsystems (mandatory on every PR)",
+]
 
 [tool.coverage.run]
 parallel = true
