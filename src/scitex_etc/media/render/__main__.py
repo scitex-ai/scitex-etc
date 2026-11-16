@@ -10,6 +10,10 @@ Usage:
 import argparse
 import json
 
+import scitex_logging as slogging
+
+_console = slogging.getPlainConsole(__name__)
+
 
 def main(argv=None):
     parser = argparse.ArgumentParser(
@@ -46,19 +50,19 @@ def main(argv=None):
 
         result = show(args.path, target=args.target, root_path=args.root, alt=args.alt)
         if args.target != "terminal":
-            print(result)
+            _console.emit(str(result))
 
     elif args.command == "classify":
         from . import classify
 
         ref = classify(args.path)
-        print(json.dumps(ref, indent=2) if ref else "null")
+        _console.emit(json.dumps(ref, indent=2) if ref else "null")
 
     elif args.command == "detect":
         from . import detect
 
         refs = detect(args.text, root_path=args.root)
-        print(json.dumps(refs, indent=2))
+        _console.emit(json.dumps(refs, indent=2))
 
     else:
         parser.print_help()
