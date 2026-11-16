@@ -10,6 +10,11 @@ name: CLA Assistant
 # There is no push trigger here (issue_comment + pull_request_target only),
 # so the reusable workflow's push-triggered owner-bypass job simply never
 # fires — same behavior as before (this repo never had that job either).
+#
+# PS-224: outsiders can trigger this workflow (issue_comment /
+# pull_request_target), so it runs GitHub-hosted (`runs_on`), never on a
+# persistent shared runner, and forwards ONLY the CLA PAT, not
+# `secrets: inherit`.
 
 on:
   issue_comment:
@@ -28,4 +33,6 @@ jobs:
     uses: scitex-ai/.github/.github/workflows/cla.yml@main
     with:
       owner_allowlist: "bot*,ywatanabe1989,LLEmacs"
-    secrets: inherit
+      runs_on: '["ubuntu-latest"]'
+    secrets:
+      GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}

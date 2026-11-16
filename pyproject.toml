@@ -25,6 +25,7 @@ classifiers = [
 dependencies = [
     "tomli; python_version<\"3.11\"",
     "readchar",
+    "scitex-logging>=0.2.5",
 ]
 
 [project.optional-dependencies]
